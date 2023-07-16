@@ -28,24 +28,58 @@ type
   end;
 
   TConnectionDefDriverParams = record
-    DriverDefName: string;
-    VendorLib: string;
+  private
+    FDriverDefName: string;
+    FVendorLib: string;
+    procedure SetDriverDefName(const Value: string);
+    procedure SetVendorLib(const Value: string);
+
+  public
+    property DriverDefName: string read FDriverDefName write SetDriverDefName;
+    property VendorLib: string read FVendorLib write SetVendorLib;
   end;
 
   TConnectionDefParams = record
-    ConnectionDefName: string;
-    Server: string;
-    Database: string;
-    UserName: string;
-    Password: string;
-    LocalConnection: Boolean;
+  private
+    FConnectionDefName: string;
+    FServer: string;
+    FDatabase: string;
+    FUserName: string;
+    FPassword: string;
+    FLocalConnection: Boolean;
+
+    procedure SetConnectionDefName(const Value: string);
+    procedure SetDatabase(const Value: string);
+    procedure SetLocalConnection(const Value: Boolean);
+    procedure SetPassword(const Value: string);
+    procedure SetServer(const Value: string);
+    procedure SetUserName(const Value: string);
+
+  public
+    property ConnectionDefName: string read FConnectionDefName write SetConnectionDefName;
+    property Server: string read FServer write SetServer;
+    property Database: string read FDatabase write SetDatabase;
+    property UserName: string read FUserName write SetUserName;
+    property Password: string read FPassword write SetPassword;
+    property LocalConnection: Boolean read FLocalConnection write SetLocalConnection;
   end;
 
   TConnectionDefPoolParams = record
-    Pooled: Boolean;
-    PoolMaximumItems: Integer;
-    PoolCleanupTimeout: Integer;
-    PoolExpireTimeout: Integer;
+  private
+    FPooled: Boolean;
+    FPoolMaximumItems: Integer;
+    FPoolCleanupTimeout: Integer;
+    FPoolExpireTimeout: Integer;
+    procedure SetPoolCleanupTimeout(const Value: Integer);
+    procedure SetPoolExpireTimeout(const Value: Integer);
+    procedure SetPoolMaximumItems(const Value: Integer);
+    procedure SetPooled(const Value: Boolean);
+
+  public
+    property Pooled: Boolean read FPooled write SetPooled;
+    property PoolMaximumItems: Integer read FPoolMaximumItems write SetPoolMaximumItems;
+    property PoolCleanupTimeout: Integer read FPoolCleanupTimeout write SetPoolCleanupTimeout;
+    property PoolExpireTimeout: Integer read FPoolExpireTimeout write SetPoolExpireTimeout;
   end;
 
 type
@@ -211,4 +245,72 @@ begin
   Result := ValueModf;
 end;
 
+{ TConnectionDefPoolParams }
+
+procedure TConnectionDefPoolParams.SetPoolCleanupTimeout(const Value: Integer);
+begin
+  FPoolCleanupTimeout:= Value;
+end;
+
+procedure TConnectionDefPoolParams.SetPooled(const Value: Boolean);
+begin
+  FPooled := Value;
+end;
+
+procedure TConnectionDefPoolParams.SetPoolExpireTimeout(const Value: Integer);
+begin
+  FPoolExpireTimeout := Value;
+end;
+
+procedure TConnectionDefPoolParams.SetPoolMaximumItems(const Value: Integer);
+begin
+  FPoolMaximumItems := Value;
+end;
+
+{ TConnectionDefParams }
+
+procedure TConnectionDefParams.SetConnectionDefName(const Value: string);
+begin
+  FConnectionDefName := Value;
+end;
+
+procedure TConnectionDefParams.SetDatabase(const Value: string);
+begin
+  FDatabase := Value;
+end;
+
+procedure TConnectionDefParams.SetLocalConnection(const Value: Boolean);
+begin
+  FLocalConnection := Value;
+end;
+
+procedure TConnectionDefParams.SetPassword(const Value: string);
+begin
+  FPassword := Value;
+end;
+
+procedure TConnectionDefParams.SetServer(const Value: string);
+begin
+  FServer := Value;
+end;
+
+procedure TConnectionDefParams.SetUserName(const Value: string);
+begin
+  FUserName := Value;
+end;
+
+{ TConnectionDefDriverParams }
+
+procedure TConnectionDefDriverParams.SetDriverDefName(const Value: string);
+begin
+  FDriverDefName := Value;
+end;
+
+procedure TConnectionDefDriverParams.SetVendorLib(const Value: string);
+begin
+  FVendorLib := Value;
+end;
+
 end.
+
+
