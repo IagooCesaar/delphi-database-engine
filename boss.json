@@ -1,0 +1,9 @@
+{
+	"name": "pascal-database-engine",
+	"description": "Biblioteca para conexão banco de dados",
+	"version": "0.0.1",
+	"homepage": "",
+	"mainsrc": "./src",
+	"projects": [],
+	"dependencies": {}
+}
