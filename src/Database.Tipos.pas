@@ -3,7 +3,7 @@ unit Database.Tipos;
 interface
 
 uses
-  Data.DB, System.Generics.Collections, System.Variants,
+  Data.DB, System.Generics.Collections, System.Variants, System.JSON,
   System.SysUtils,
   FireDac.DApt, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
@@ -116,6 +116,7 @@ type
     function Error: string; overload;
     function &Unit(const AValue: string): EDatabaseException; overload;
     function &Unit: string; overload;
+    function ToJSONObject: TJSONObject; virtual;
 
     class function New: EDatabaseException;
   end;
@@ -357,6 +358,15 @@ end;
 class function EDatabaseException.New: EDatabaseException;
 begin
   Result := Self.Create;
+end;
+
+function EDatabaseException.ToJSONObject: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.{$IF DEFINED(FPC)}Add{$ELSE}AddPair{$ENDIF}('error', FError);
+
+  if not FUnit.Trim.IsEmpty
+  then Result.{$IF DEFINED(FPC)}Add{$ELSE}AddPair{$ENDIF}('unit', FUnit);
 end;
 
 function EDatabaseException.&Unit: string;
