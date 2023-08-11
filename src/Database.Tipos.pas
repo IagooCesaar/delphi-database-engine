@@ -1,5 +1,7 @@
 unit Database.Tipos;
+
 interface
+
 uses
   Data.DB, System.Generics.Collections, System.Variants,
   System.SysUtils,
@@ -8,6 +10,7 @@ uses
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Phys, FireDAC.Comp.Client,
   FireDAC.Comp.DataSet, FireDac.Comp.Script, FireDAC.Stan.Param,
   FireDAC.Comp.ScriptCommands, FireDAC.Stan.Util;
+
 type
   TQuery = FireDAC.Comp.Client.TFDQuery;
   TStoredProc = FireDAC.Comp.Client.TFDStoredProc;
@@ -21,6 +24,7 @@ type
     FValor: variant;
     FTipo: TFieldType; // ftString, ftInteger, ftFloat, ftDateTime
   end;
+
   TConnectionDefDriverParams = record
   private
     FDriverID: String;
@@ -34,6 +38,7 @@ type
     property DriverDefName: string read FDriverDefName write SetDriverDefName;
     property VendorLib: string read FVendorLib write SetVendorLib;
   end;
+
   TConnectionDefParams = record
   private
     FConnectionDefName: string;
@@ -59,6 +64,7 @@ type
     property Password: string read FPassword write SetPassword;
     property LocalConnection: Boolean read FLocalConnection write SetLocalConnection;
   end;
+
   TConnectionDefPoolParams = record
   private
     FPooled: Boolean;
@@ -75,6 +81,7 @@ type
     property PoolCleanupTimeout: Integer read FPoolCleanupTimeout write SetPoolCleanupTimeout;
     property PoolExpireTimeout: Integer read FPoolExpireTimeout write SetPoolExpireTimeout;
   end;
+
 type
  TParamList = class
   private
@@ -96,6 +103,23 @@ type
     class function VarToDateTime(Value: Variant): TDateTime;
     property Lista: TObjectDictionary<string, TParamsConsultaBDValue> read fLista;
   end;
+
+  EDatabaseException = class(Exception)
+  strict private
+    FError: string;
+    FUnit: string;
+
+  public
+    constructor Create; reintroduce;
+
+    function Error(const AValue: string): EDatabaseException; overload;
+    function Error: string; overload;
+    function &Unit(const AValue: string): EDatabaseException; overload;
+    function &Unit: string; overload;
+
+    class function New: EDatabaseException;
+  end;
+
 implementation
 
 { TParamList }
@@ -309,6 +333,41 @@ end;
 procedure TConnectionDefDriverParams.SetVendorLib(const Value: string);
 begin
   FVendorLib := Value;
+end;
+
+{ EDatabaseException }
+
+constructor EDatabaseException.Create;
+begin
+  FError := EmptyStr;
+  FUnit := EmptyStr;
+end;
+
+function EDatabaseException.Error(const AValue: string): EDatabaseException;
+begin
+  Result := Self;
+  FError := AValue;
+end;
+
+function EDatabaseException.Error: string;
+begin
+  Result := FError;
+end;
+
+class function EDatabaseException.New: EDatabaseException;
+begin
+  Result := Self.Create;
+end;
+
+function EDatabaseException.&Unit: string;
+begin
+  Result := FUnit;
+end;
+
+function EDatabaseException.&Unit(const AValue: string): EDatabaseException;
+begin
+  Result := Self;
+  FUnit := AValue;
 end;
 
 end.

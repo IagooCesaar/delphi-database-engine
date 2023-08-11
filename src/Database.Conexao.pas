@@ -18,6 +18,7 @@ type
     FDriverParams: TConnectionDefDriverParams;
     FPoolParams: TConnectionDefPoolParams;
 
+    //DEFINIÇÃO DE CONEXÃO: PRIVADO :: https://docwiki.embarcadero.com/RADStudio/Sydney/en/Defining_Connection_(FireDAC)
     procedure IniciarPoolFB(AFDStanConnectionDef: TFDConnectionDefParams);
     procedure IniciarPoolMySQL(AFDStanConnectionDef: TFDConnectionDefParams);
 
@@ -123,7 +124,7 @@ begin
   try
     LConnection.FetchOptions.Mode := TFDFetchMode.fmAll; //fmAll
     LConnection.ResourceOptions.AutoConnect := False;
-//    lConnection.ResourceOptions.AutoReconnect := True;  //PERDA DE PERFORMANCE COM THREAD
+    //lConnection.ResourceOptions.AutoReconnect := True;  //PERDA DE PERFORMANCE COM THREAD
 
     with LConnection.FormatOptions.MapRules.Add do
     begin
@@ -147,7 +148,6 @@ procedure TDatabaseConexao.IniciarPoolFB(
   AFDStanConnectionDef: TFDConnectionDefParams);
 var LFBConnectionDefParams: TFDPhysFBConnectionDefParams; // FIREBIRD CONNECTION PARAMS
 begin
-  //DEFINIÇÃO DE CONEXÃO: PRIVADO :: https://docwiki.embarcadero.com/RADStudio/Sydney/en/Defining_Connection_(FireDAC)
   LFBConnectionDefParams := TFDPhysFBConnectionDefParams(AFDStanConnectionDef);
   LFBConnectionDefParams.DriverID := FDriverParams.DriverDefName;
   LFBConnectionDefParams.Database := FParams.Database;
@@ -166,18 +166,14 @@ end;
 
 procedure TDatabaseConexao.IniciarPoolMySQL(
   AFDStanConnectionDef: TFDConnectionDefParams);
-var LConnectionDefParams: TFDPhysMySQLConnectionDefParams; // FIREBIRD CONNECTION PARAMS
+var LConnectionDefParams: TFDPhysMySQLConnectionDefParams;
 begin
-  //DEFINIÇÃO DE CONEXÃO: PRIVADO :: https://docwiki.embarcadero.com/RADStudio/Sydney/en/Defining_Connection_(FireDAC)
   LConnectionDefParams := TFDPhysMySQLConnectionDefParams(AFDStanConnectionDef);
   LConnectionDefParams.DriverID := FDriverParams.DriverDefName;
   LConnectionDefParams.Database := FParams.Database;
   LConnectionDefParams.UserName := FParams.UserName;
   LConnectionDefParams.Password := FParams.Password;
   LConnectionDefParams.Server := FParams.Server;
-//  LConnectionDefParams.Protocol := TIBProtocol.ipLocal;
-//  if not FParams.LocalConnection then
-//    LConnectionDefParams.Protocol := TIBProtocol.ipTCPIP;
 
   LConnectionDefParams.Pooled := FPoolParams.Pooled;
   LConnectionDefParams.PoolMaximumItems := FPoolParams.PoolMaximumItems;

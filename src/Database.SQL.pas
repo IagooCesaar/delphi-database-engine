@@ -82,9 +82,6 @@ type
 implementation
 
 uses
-//  Horse.Exception,
-//  Horse.Commons,
-
   Database.Factory;
 
 { TDatabaseSQL }
@@ -160,10 +157,10 @@ end;
 procedure TDatabaseSQL.AddNull(pTipo: TFieldType; pNome: string;
   pValor: variant);
 begin
-//  if not VarIsNull(pValor) then
-//    raise EHorseException.New
-//            .Error('O parâmetro ('+pNome+') deve ser, obrigatoriamento, do tipo Nulo ou '+ FieldTypeNames[pTipo])
-//            .&Unit(Self.UnitName);
+  if not VarIsNull(pValor) then
+    raise EDatabaseException.New
+            .Error('O parâmetro ('+pNome+') deve ser, obrigatoriamento, do tipo Nulo ou '+ FieldTypeNames[pTipo])
+            .&Unit(Self.UnitName);
   FQuery.ParamByName(pNome).DataType := pTipo;
   FQuery.ParamByName(pNome).Value := Null;
 end;
@@ -274,7 +271,7 @@ begin
   except
     on E: Exception do
     begin
-//      raise EHorseException.New.Error(E.Message).&Unit(Self.UnitName);
+      raise EDatabaseException.New.Error(E.Message).&Unit(Self.UnitName);
     end;
   end;
 end;
@@ -352,9 +349,9 @@ begin
   except
     on E: Exception do
     begin
-//      raise EHorseException.New
-//        .Error(E.Message)
-//        .&Unit(Self.UnitName)
+      raise EDatabaseException.New
+        .Error(E.Message)
+        .&Unit(Self.UnitName)
     end;
   end;
 end;
@@ -367,9 +364,9 @@ begin
   except
     on E: Exception do
     begin
-//      raise EHorseException.New
-//        .Error(E.Message)
-//        .&Unit(Self.UnitName);
+      raise EDatabaseException.New
+        .Error(E.Message)
+        .&Unit(Self.UnitName);
     end;
   end;
 end;
@@ -402,9 +399,9 @@ procedure TDatabaseSQL.ValidaSQL(pSQL: string);
 begin
   if Trim(pSQL) = '' then
   begin
-//    raise EHorseException.New
-//      .Error('Script SQL não informado!')
-//      .&Unit(Self.UnitName);
+    raise EDatabaseException.New
+      .Error('Script SQL não informado!')
+      .&Unit(Self.UnitName);
   end;
 end;
 
