@@ -5,7 +5,11 @@ interface
 uses
   System.Classes,
   Database.Interfaces,
-  Database.Tipos;
+  Database.Tipos,
+
+  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
+  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Phys, FireDAC.Comp.Client,
+  FireDAC.Comp.DataSet;
 
 type
   TDatabaseConexao = class(TNoRefCountObject, IDataBaseConexao)
@@ -14,7 +18,11 @@ type
     FDriverParams: TConnectionDefDriverParams;
     FPoolParams: TConnectionDefPoolParams;
 
+    procedure IniciarPoolFB(AFDStanConnectionDef: TFDConnectionDefParams);
+    procedure IniciarPoolMySQL(AFDStanConnectionDef: TFDConnectionDefParams);
+
     class var FConexao: TDatabaseConexao;
+
   public
     constructor Create;
     destructor Destroy; override;
@@ -35,15 +43,16 @@ implementation
 uses
   System.SysUtils,
 
-  FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
-  FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Phys, FireDAC.Comp.Client,
-  FireDAC.Comp.DataSet,
+  FireDAC.Phys.IBWrapper,
 
   //FIREBIRD
   FireDAC.Phys.FBDef,
   FireDAC.Phys.IBBase,
   FireDAC.Phys.FB,
-  FireDAC.Phys.IBWrapper;
+  //MySQL
+  FireDAC.Phys.MySQLDef,
+  FireDAC.Phys.MySQL
+  ;
 
 { TDatabaseConexao }
 
@@ -90,7 +99,7 @@ begin
     LFDStanDefinition := FDManager.DriverDefs.Add;
     LFDStanDefinition.Name := FDriverParams.DriverDefName;
   end;
-  LFDStanDefinition.AsString['BaseDriverID'] := 'FB'; //DRIVER BASE
+  LFDStanDefinition.AsString['BaseDriverID'] := FDriverParams.DriverID; //DRIVER BASE
   if not FDriverParams.VendorLib.Trim.IsEmpty then
     LFDStanDefinition.AsString['VendorLib'] := FDriverParams.VendorLib; //DEFINE O CAMINHO DA DLL CLIENT DO FIREBIRD.
 
@@ -102,21 +111,12 @@ begin
     LFDStanConnectionDef.Name := FParams.ConnectionDefName;
   end;
 
-  //DEFINIÇÃO DE CONEXÃO: PRIVADO :: https://docwiki.embarcadero.com/RADStudio/Sydney/en/Defining_Connection_(FireDAC)
-  LFBConnectionDefParams := TFDPhysFBConnectionDefParams(LFDStanConnectionDef.Params);
-  LFBConnectionDefParams.DriverID := FDriverParams.DriverDefName;
-  LFBConnectionDefParams.Database := FParams.Database;
-  LFBConnectionDefParams.UserName := FParams.UserName;
-  LFBConnectionDefParams.Password := FParams.Password;
-  LFBConnectionDefParams.Server := FParams.Server;
-  LFBConnectionDefParams.Protocol := TIBProtocol.ipLocal;
-  if not FParams.LocalConnection then
-    LFBConnectionDefParams.Protocol := TIBProtocol.ipTCPIP;
+  if FDriverParams.DriverID = 'FB'
+  then IniciarPoolFB(LFDStanConnectionDef.Params)
+  else
+  if FDriverParams.DriverID = 'MySQL'
+  then IniciarPoolMySQL(LFDStanConnectionDef.Params);
 
-  LFBConnectionDefParams.Pooled := FPoolParams.Pooled;
-  LFBConnectionDefParams.PoolMaximumItems := FPoolParams.PoolMaximumItems;
-  LFBConnectionDefParams.PoolCleanupTimeout := FPoolParams.PoolCleanupTimeout;
-  LFBConnectionDefParams.PoolExpireTimeout := FPoolParams.PoolExpireTimeout;
 
   //WriteOptions
   LConnection := TFDCustomConnection.Create(nil);
@@ -141,6 +141,48 @@ begin
 
   if (FDManager.State <> TFDPhysManagerState.dmsActive) then
     FDManager.Open;
+end;
+
+procedure TDatabaseConexao.IniciarPoolFB(
+  AFDStanConnectionDef: TFDConnectionDefParams);
+var LFBConnectionDefParams: TFDPhysFBConnectionDefParams; // FIREBIRD CONNECTION PARAMS
+begin
+  //DEFINIÇÃO DE CONEXÃO: PRIVADO :: https://docwiki.embarcadero.com/RADStudio/Sydney/en/Defining_Connection_(FireDAC)
+  LFBConnectionDefParams := TFDPhysFBConnectionDefParams(AFDStanConnectionDef);
+  LFBConnectionDefParams.DriverID := FDriverParams.DriverDefName;
+  LFBConnectionDefParams.Database := FParams.Database;
+  LFBConnectionDefParams.UserName := FParams.UserName;
+  LFBConnectionDefParams.Password := FParams.Password;
+  LFBConnectionDefParams.Server := FParams.Server;
+  LFBConnectionDefParams.Protocol := TIBProtocol.ipLocal;
+  if not FParams.LocalConnection then
+    LFBConnectionDefParams.Protocol := TIBProtocol.ipTCPIP;
+
+  LFBConnectionDefParams.Pooled := FPoolParams.Pooled;
+  LFBConnectionDefParams.PoolMaximumItems := FPoolParams.PoolMaximumItems;
+  LFBConnectionDefParams.PoolCleanupTimeout := FPoolParams.PoolCleanupTimeout;
+  LFBConnectionDefParams.PoolExpireTimeout := FPoolParams.PoolExpireTimeout;
+end;
+
+procedure TDatabaseConexao.IniciarPoolMySQL(
+  AFDStanConnectionDef: TFDConnectionDefParams);
+var LConnectionDefParams: TFDPhysMySQLConnectionDefParams; // FIREBIRD CONNECTION PARAMS
+begin
+  //DEFINIÇÃO DE CONEXÃO: PRIVADO :: https://docwiki.embarcadero.com/RADStudio/Sydney/en/Defining_Connection_(FireDAC)
+  LConnectionDefParams := TFDPhysMySQLConnectionDefParams(AFDStanConnectionDef);
+  LConnectionDefParams.DriverID := FDriverParams.DriverDefName;
+  LConnectionDefParams.Database := FParams.Database;
+  LConnectionDefParams.UserName := FParams.UserName;
+  LConnectionDefParams.Password := FParams.Password;
+  LConnectionDefParams.Server := FParams.Server;
+//  LConnectionDefParams.Protocol := TIBProtocol.ipLocal;
+//  if not FParams.LocalConnection then
+//    LConnectionDefParams.Protocol := TIBProtocol.ipTCPIP;
+
+  LConnectionDefParams.Pooled := FPoolParams.Pooled;
+  LConnectionDefParams.PoolMaximumItems := FPoolParams.PoolMaximumItems;
+  LConnectionDefParams.PoolCleanupTimeout := FPoolParams.PoolCleanupTimeout;
+  LConnectionDefParams.PoolExpireTimeout := FPoolParams.PoolExpireTimeout;
 end;
 
 class function TDatabaseConexao.New: IDataBaseConexao;

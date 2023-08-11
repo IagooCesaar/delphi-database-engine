@@ -1,17 +1,13 @@
 unit Database.Tipos;
-
 interface
-
 uses
   Data.DB, System.Generics.Collections, System.Variants,
   System.SysUtils,
-
   FireDac.DApt, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Phys, FireDAC.Comp.Client,
   FireDAC.Comp.DataSet, FireDac.Comp.Script, FireDAC.Stan.Param,
   FireDAC.Comp.ScriptCommands, FireDAC.Stan.Util;
-
 type
   TQuery = FireDAC.Comp.Client.TFDQuery;
   TStoredProc = FireDAC.Comp.Client.TFDStoredProc;
@@ -21,49 +17,48 @@ type
   TConnection = FireDAC.Comp.Client.TFDConnection;
   TDataSet = Data.DB.TDataSet;
 
-
   TParamsConsultaBDValue = record
     FValor: variant;
     FTipo: TFieldType; // ftString, ftInteger, ftFloat, ftDateTime
   end;
-
   TConnectionDefDriverParams = record
   private
+    FDriverID: String;
     FDriverDefName: string;
     FVendorLib: string;
+    procedure SetDriverID(const Value: string);
     procedure SetDriverDefName(const Value: string);
     procedure SetVendorLib(const Value: string);
-
   public
+    property DriverID: string read FDriverID write SetDriverID;
     property DriverDefName: string read FDriverDefName write SetDriverDefName;
     property VendorLib: string read FVendorLib write SetVendorLib;
   end;
-
   TConnectionDefParams = record
   private
     FConnectionDefName: string;
     FServer: string;
+    FPort: Integer;
     FDatabase: string;
     FUserName: string;
     FPassword: string;
     FLocalConnection: Boolean;
-
     procedure SetConnectionDefName(const Value: string);
     procedure SetDatabase(const Value: string);
     procedure SetLocalConnection(const Value: Boolean);
     procedure SetPassword(const Value: string);
     procedure SetServer(const Value: string);
     procedure SetUserName(const Value: string);
-
+    procedure SetPort(const Value: Integer);
   public
     property ConnectionDefName: string read FConnectionDefName write SetConnectionDefName;
     property Server: string read FServer write SetServer;
+    property Port: Integer read FPort write SetPort;
     property Database: string read FDatabase write SetDatabase;
     property UserName: string read FUserName write SetUserName;
     property Password: string read FPassword write SetPassword;
     property LocalConnection: Boolean read FLocalConnection write SetLocalConnection;
   end;
-
   TConnectionDefPoolParams = record
   private
     FPooled: Boolean;
@@ -74,14 +69,12 @@ type
     procedure SetPoolExpireTimeout(const Value: Integer);
     procedure SetPoolMaximumItems(const Value: Integer);
     procedure SetPooled(const Value: Boolean);
-
   public
     property Pooled: Boolean read FPooled write SetPooled;
     property PoolMaximumItems: Integer read FPoolMaximumItems write SetPoolMaximumItems;
     property PoolCleanupTimeout: Integer read FPoolCleanupTimeout write SetPoolCleanupTimeout;
     property PoolExpireTimeout: Integer read FPoolExpireTimeout write SetPoolExpireTimeout;
   end;
-
 type
  TParamList = class
   private
@@ -103,7 +96,6 @@ type
     class function VarToDateTime(Value: Variant): TDateTime;
     property Lista: TObjectDictionary<string, TParamsConsultaBDValue> read fLista;
   end;
-
 implementation
 
 { TParamList }
@@ -136,9 +128,9 @@ begin
       result.fLista.Add(Key,fLista.Items[Key]);
   end;
 end;
-
 constructor TParamList.Create;
 begin
+
   fLista := TObjectDictionary<string, TParamsConsultaBDValue>.Create;
 end;
 
@@ -231,7 +223,6 @@ var
 begin
   ValueModf := Value;
   mVarType  := VarType(ValueModf);
-
   if (mVarType = varString) or (mVarType = varUString) then
   begin
     if (Value = '') then
@@ -241,7 +232,6 @@ begin
   if ((mVarType = varDate) or (mVarType = varInteger)) then
      if (Value = 0) then
         ValueModf := null;
-
   Result := ValueModf;
 end;
 
@@ -289,6 +279,11 @@ begin
   FPassword := Value;
 end;
 
+procedure TConnectionDefParams.SetPort(const Value: Integer);
+begin
+  FPort := Value;
+end;
+
 procedure TConnectionDefParams.SetServer(const Value: string);
 begin
   FServer := Value;
@@ -300,6 +295,11 @@ begin
 end;
 
 { TConnectionDefDriverParams }
+
+procedure TConnectionDefDriverParams.SetDriverID(const Value: string);
+begin
+  FDriverID := Value;
+end;
 
 procedure TConnectionDefDriverParams.SetDriverDefName(const Value: string);
 begin

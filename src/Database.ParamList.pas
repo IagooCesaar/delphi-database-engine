@@ -32,9 +32,9 @@ type
 
 implementation
 
-uses
-  Horse,
-  Horse.Exception;
+//uses
+//  Horse,
+//  Horse.Exception;
 
 { TDatabaseParamList }
 
@@ -97,9 +97,9 @@ procedure TDatabaseParamList.AddNull(pTipo: TFieldType; pNome: string;
   pValor: variant);
 begin
   if not VarIsNull(pValor) then
-    raise EHorseException.New
-            .Error('O parâmetro ('+pNome+') deve ser, obrigatoriamento, do tipo Nulo ou '+ FieldTypeNames[pTipo])
-            .&Unit(Self.UnitName);
+//    raise EHorseException.New
+//            .Error('O parâmetro ('+pNome+') deve ser, obrigatoriamento, do tipo Nulo ou '+ FieldTypeNames[pTipo])
+//            .&Unit(Self.UnitName);
   FParams.ParamByName(pNome).DataType := pTipo;
   FParams.ParamByName(pNome).Value := Null;
 end;
