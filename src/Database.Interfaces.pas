@@ -22,7 +22,9 @@ type
     function SetConnectionDefPoolParams(PParams: TConnectionDefPoolParams): IDatabaseConexao;
 
     function IniciaPoolConexoes: IDatabaseConexao;
-    function GetConnection: TConnection;
+    function GetConnection: TConnection; overload;
+    function GetConnection(AConnectionDefName: String): TConnection; overload;
+
   end;
 
   IDatabaseSQLParamList = interface

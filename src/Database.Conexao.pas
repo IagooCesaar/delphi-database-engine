@@ -36,7 +36,8 @@ type
     function SetConnectionDefPoolParams(PParams: TConnectionDefPoolParams): IDatabaseConexao;
 
     function IniciaPoolConexoes: IDatabaseConexao;
-    function GetConnection: TConnection;
+    function GetConnection: TConnection; overload;
+    function GetConnection(AConnectionDefName: String): TConnection; overload;
   end;
 
 implementation
@@ -67,6 +68,13 @@ destructor TDatabaseConexao.Destroy;
 begin
 
   inherited;
+end;
+
+function TDatabaseConexao.GetConnection(
+  AConnectionDefName: String): TConnection;
+begin
+  Result := TConnection.Create(nil);
+  Result.ConnectionName := AConnectionDefName;
 end;
 
 function TDatabaseConexao.GetConnection: TConnection;
